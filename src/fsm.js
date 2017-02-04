@@ -69,11 +69,8 @@ class FSM {
             this.redoTransitions.shift();
         }
         
-
-        // shorter variable
-        var currentTree = this.currentConfig.states[this.currentState].transitions;
         if (Object.keys(this.currentConfig.states[this.currentState].transitions).includes(event)) {
-            this.currentState = currentTree[event];
+            this.currentState = this.currentConfig.states[this.currentState].transitions[event];
             this.undoTransitions.push(this.previousState);
             this.redoTransitions.push(this.currentState);
         } else throw new Error('This event in current state isn\'t exist');
