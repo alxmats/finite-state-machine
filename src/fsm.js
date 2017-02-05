@@ -35,21 +35,19 @@ class FSM {
      */
     changeState(state) {
         
-        // "undo" was done and at once "redo" was not done => clear "redo" buffer
+        // undo was done and at once redo was not done => clear redo buffer
         if (!this.undoTransitions.length && this.redoTransitions.length) {
             this.redoTransitions.shift();
         }
         
         this.previousState = this.currentState;
         
-        // check array for @param existence
-        function checkArray (element) {
-            return element == state;
-        }
-
-        if (Object.keys(this.currentConfig.states).some(checkArray)) {
+        // check state existence for currentState
+        if (Object.keys(this.currentConfig.states).includes(state)) {
             this.currentState = state;
-            this.undoTransitions.push(this.previousState); // important, for undo, redo functioning
+
+            // memorize currentState and previousState to undo/redo buffers
+            this.undoTransitions.push(this.previousState); 
             this.redoTransitions.push(this.currentState);
             return;
         }
@@ -64,13 +62,16 @@ class FSM {
     trigger(event) {
         this.previousState = this.currentState;
 
-        // "undo" was done and at once "redo" was not done => clear "redo" buffer
+        // undo was done and at once redo was not done => clear redo buffer
         if (!this.undoTransitions.length && this.redoTransitions.length) {
             this.redoTransitions.shift();
         }
         
+        // check event existence for currentState
         if (Object.keys(this.currentConfig.states[this.currentState].transitions).includes(event)) {
             this.currentState = this.currentConfig.states[this.currentState].transitions[event];
+
+            // memorize currentState and previousState to undo/redo buffers
             this.undoTransitions.push(this.previousState);
             this.redoTransitions.push(this.currentState);
         } else throw new Error('This event in current state isn\'t exist');
